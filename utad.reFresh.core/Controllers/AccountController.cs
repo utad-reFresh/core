@@ -19,7 +19,7 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+        var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, DisplayName = model.DisplayName };
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
@@ -47,13 +47,15 @@ public class AccountController : ControllerBase
 
 public class RegisterModel
 {
-    public string Email { get; set; }
-    public string Password { get; set; }
+    public required string DisplayName { get; set; }
+    public required string UserName { get; set; }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
 }
 
 public class LoginModel
 {
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public bool RememberMe { get; set; }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+    public required bool RememberMe { get; set; } = false;
 }

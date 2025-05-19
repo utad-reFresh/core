@@ -1,4 +1,4 @@
-namespace utad.reFresh.core
+namespace utad.reFresh.core.Models
 {
     public class WeatherForecast
     {
