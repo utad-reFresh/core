@@ -4,3 +4,4 @@
 
 ----
 # reFresh Core
+O reFresh Core é uma aplicação ASP.NET que implementa a API e o website da plataforma, utilizando Blazor para uma experiência dinâmica e eficiente.
