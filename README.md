@@ -3,5 +3,5 @@
 </div>
 
 ----
-# reFresh Core
+# reFresh Core ![build status](https://github.com/utad-reFresh/core/actions/workflows/dotnet.yml/badge.svg)
 O reFresh Core é uma aplicação ASP.NET que implementa a API e o website da plataforma, utilizando Blazor para uma experiência dinâmica e eficiente.
