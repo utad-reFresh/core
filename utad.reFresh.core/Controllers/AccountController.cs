@@ -11,6 +11,7 @@ using utad.reFresh.core.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -68,6 +69,15 @@ public class AccountController(
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
+        
+        var puser = await _userManager.FindByEmailAsync(model.Email);
+        if (puser == null)
+            return BadRequest(new { error = "User not found" });
+
+        if (!await _userManager.CheckPasswordAsync(puser, model.Password))
+            return BadRequest(new { error = "Wrong password" });
+
+        
         var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
 
         if (result.Succeeded)
@@ -100,7 +110,26 @@ public class AccountController(
 
         return BadRequest("Invalid login attempt.");
     }
+    
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound("Authenticated user not found.");
+        return Ok(new
+        {
+           user.DisplayName,
+           user.Email,
+           user.PhotoUrl
+        });
+    }
+    
+    
 }
+
 
 public class RegisterModel
 {
