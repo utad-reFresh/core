@@ -21,6 +21,11 @@ O reFresh Core é uma aplicação ASP.NET que implementa a API e o website da pl
     "FromName": "<<nome do email reFresh account services>>",
     "ApplicationUrl": "<<link da app https://playable.jestev.es>>"
   },
+  "Jwt": {
+    "Issuer": "<<issuer>>",
+    "Audience": "<<audience>>",
+    "Key": "<<key>>"
+  },
   "Logging": {
     "LogLevel": {
       "Default": "Information",
