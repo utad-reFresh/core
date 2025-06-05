@@ -1,4 +1,6 @@
-﻿namespace utad.reFresh.core.Controllers;
+﻿using Microsoft.IdentityModel.Tokens;
+
+namespace utad.reFresh.core.Controllers;
 
 using System.Text;
 using System.Text.Encodings.Web;
@@ -7,23 +9,28 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using utad.reFresh.core.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 [Route("api/[controller]")]
 [ApiController]
 public class AccountController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
-    IEmailSender emailSender)
+    IEmailSender emailSender,
+    IConfiguration configuration)
     : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
     private readonly IEmailSender _emailSender = emailSender;
+    private readonly IConfiguration _configuration = configuration;
+    
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, DisplayName = model.DisplayName };
+        var user = new ApplicationUser { UserName = model.Email, Email = model.Email, DisplayName = model.DisplayName };
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
@@ -50,7 +57,7 @@ public class AccountController(
             );
 
             await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>.");
 
             return Ok();
         }
@@ -61,11 +68,34 @@ public class AccountController(
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
-        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
 
         if (result.Succeeded)
         {
-            return Ok();
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            
+            if (user == null || string.IsNullOrEmpty(user.Id) || string.IsNullOrEmpty(user.Email))
+            {
+                return NotFound("User not found.");
+            }
+            
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured.")));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience : _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: creds);
+
+            return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
         }
 
         return BadRequest("Invalid login attempt.");
@@ -75,7 +105,6 @@ public class AccountController(
 public class RegisterModel
 {
     public required string DisplayName { get; set; }
-    public required string UserName { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }
 }
@@ -84,5 +113,4 @@ public class LoginModel
 {
     public required string Email { get; set; }
     public required string Password { get; set; }
-    public required bool RememberMe { get; set; } = false;
 }
