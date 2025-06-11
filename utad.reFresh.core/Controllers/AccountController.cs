@@ -127,12 +127,82 @@ public class AccountController(
         });
     }
     
+    [HttpPost("changePassword")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound("Authenticated user not found.");
+
+        var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+        if (result.Succeeded)
+        {
+            return Ok("Password changed successfully.");
+        }
+
+        return BadRequest(result.Errors);
+    }
     
+    [HttpPost("sendRecoveryEmail")]
+    public async Task<IActionResult> SendRecoveryEmail([FromBody] string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+            return NotFound("User not found.");
+
+        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+        var callbackUrl = Url.Page(
+            "/Account/ResetPassword",
+            pageHandler: null,
+            values: new { area = "Identity", code = code },
+            protocol: Request.Scheme);
+
+        await _emailSender.SendEmailAsync(email, "Reset Password",
+            $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>.");
+
+        return Ok("Recovery email sent.");
+    }
+    
+    [HttpPost("changeUserData")] 
+    [Authorize]
+    public async Task<IActionResult> ChangeUserData([FromBody] ChangeUserDataModel model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound("Authenticated user not found.");
+
+        user.DisplayName = model.DisplayName ?? user.DisplayName;
+        user.PhotoUrl = model.PhotoUrl;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+        {
+            return Ok("User data updated successfully.");
+        }
+
+        return BadRequest(result.Errors);
+    }
+    
+}
+
+public class ChangeUserDataModel
+{
+    public required string DisplayName { get; set; }
+    public string? PhotoUrl { get; set; }
+}
+
+public class ChangePasswordModel
+{
+    public required string CurrentPassword { get; set; }
+    public required string NewPassword { get; set; }
 }
 
 
 public class RegisterModel
-{
+{ 
     public required string DisplayName { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }

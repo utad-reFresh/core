@@ -29,4 +29,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
 
+  <Target Name="GenerateGitVersion" AfterTargets="Build">
+    <Exec Command="git rev-parse --short HEAD &gt; $(ProjectDir)wwwroot\gitversion.txt" />
+  </Target>
+  
 </Project>

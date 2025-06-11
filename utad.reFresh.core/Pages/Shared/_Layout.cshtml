@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Hosting
 @using Microsoft.AspNetCore.Mvc.ViewEngines
+@using System.IO
 @inject IWebHostEnvironment Environment
 @inject ICompositeViewEngine Engine
 <!DOCTYPE html>
@@ -55,9 +56,26 @@
             @RenderBody()
         </main>
     </div>
+
+
+    @{
+        var gitVersionPath = System.IO.Path.Combine(Environment.WebRootPath, "gitversion.txt");
+        var gitVersion = System.IO.File.Exists(gitVersionPath) ? System.IO.File.ReadAllText(gitVersionPath).Trim() : null;
+        var gitCommitUrl = gitVersion != null ? $"https://github.com/utad-reFresh/core/commit/{gitVersion}" : null;
+    }
     <footer class="footer border-top pl-3 text-muted">
         <div class="container">
-        &copy; 2025 - utad.reFresh.core
+            &copy; 2025 - utad.reFresh.core
+            <span class="ml-2">| Version:
+                @if (gitCommitUrl != null)
+                {
+                    <a href="@gitCommitUrl" target="_blank">@gitVersion</a>
+                }
+                else
+                {
+                    <span>N/A</span>
+                }
+            </span>
             @{
                 var foundPrivacy = Url.Page("/Privacy", new { area = "" });
             }
@@ -67,6 +85,7 @@
             }
         </div>
     </footer>
+
 
     <environment include="Development">
         <script src="~/Identity/lib/jquery/dist/jquery.js"></script>
