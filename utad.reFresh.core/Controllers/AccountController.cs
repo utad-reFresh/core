@@ -54,9 +54,9 @@ public class AccountController(
                 "/Account/ConfirmEmail",
                 pageHandler: null,
                 values: new { area = "Identity", userId = userId, code = code },
-                protocol: uri.Scheme,
-                host: uri.Host + (uri.IsDefaultPort ? "" : $":{uri.Port}")
-            );
+                protocol: Request.Scheme
+                );
+            
 
             await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
                 $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>.");
@@ -160,11 +160,8 @@ public class AccountController(
             pageHandler: null,
             values: new { area = "Identity", code = code },
             protocol: Request.Scheme);
-
-        if (user.Email == null)
-            return BadRequest("User email is not set.");
         
-        await _emailSender.SendEmailAsync(user.Email, "Reset Password",
+        await _emailSender.SendEmailAsync(model.Email, "Reset Password",
             $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>.");
 
         return Ok("Recovery email sent.");
