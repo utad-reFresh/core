@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace utad.reFresh.core.Controllers;
 
@@ -112,7 +113,7 @@ public class AccountController(
     }
     
     [HttpGet("me")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> GetCurrentUser()
     {
         
@@ -128,7 +129,7 @@ public class AccountController(
     }
     
     [HttpPost("changePassword")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -145,9 +146,9 @@ public class AccountController(
     }
     
     [HttpPost("sendRecoveryEmail")]
-    public async Task<IActionResult> SendRecoveryEmail([FromBody] string email)
+    public async Task<IActionResult> SendRecoveryEmail([FromBody] RecoveryEmailModel model)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
             return NotFound("User not found.");
 
@@ -160,38 +161,90 @@ public class AccountController(
             values: new { area = "Identity", code = code },
             protocol: Request.Scheme);
 
-        await _emailSender.SendEmailAsync(email, "Reset Password",
+        if (user.Email == null)
+            return BadRequest("User email is not set.");
+        
+        await _emailSender.SendEmailAsync(user.Email, "Reset Password",
             $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>.");
 
         return Ok("Recovery email sent.");
     }
     
-    [HttpPost("changeUserData")] 
-    [Authorize]
-    public async Task<IActionResult> ChangeUserData([FromBody] ChangeUserDataModel model)
+    [HttpPost("changeDisplayName")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> ChangeDisplayName([FromBody] ChangeDisplayNameModel model)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
             return NotFound("Authenticated user not found.");
 
-        user.DisplayName = model.DisplayName ?? user.DisplayName;
-        user.PhotoUrl = model.PhotoUrl;
-
+        user.DisplayName = model.DisplayName;
         var result = await _userManager.UpdateAsync(user);
+
         if (result.Succeeded)
+            return Ok("Display name updated successfully.");
+
+        return BadRequest(result.Errors);
+    }
+
+    [HttpPost("changePhoto")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> ChangePhoto([FromForm] ChangePhotoModel model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound("Authenticated user not found.");
+
+        if (model.Photo == null || model.Photo.Length == 0)
+            return BadRequest("No photo uploaded.");
+
+        var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        Directory.CreateDirectory(uploads);
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.Photo.FileName)}";
+        var filePath = Path.Combine(uploads, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
         {
-            return Ok("User data updated successfully.");
+            await model.Photo.CopyToAsync(stream);
         }
+
+        user.PhotoUrl = $"/uploads/{fileName}";
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
+            return Ok("Photo updated successfully.");
+
+        return BadRequest(result.Errors);
+    }
+    
+    [HttpPost("removePhoto")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> RemovePhoto()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return NotFound("Authenticated user not found.");
+
+        user.PhotoUrl = null; // or set to a default image URL if needed
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
+            return Ok("Photo removed successfully.");
 
         return BadRequest(result.Errors);
     }
     
 }
 
-public class ChangeUserDataModel
+public class ChangePhotoModel
+{
+    public IFormFile Photo { get; set; }
+}
+
+public class ChangeDisplayNameModel
 {
     public required string DisplayName { get; set; }
-    public string? PhotoUrl { get; set; }
 }
 
 public class ChangePasswordModel
@@ -200,6 +253,10 @@ public class ChangePasswordModel
     public required string NewPassword { get; set; }
 }
 
+public class RecoveryEmailModel
+{
+    public required string Email { get; set; }
+}
 
 public class RegisterModel
 { 
