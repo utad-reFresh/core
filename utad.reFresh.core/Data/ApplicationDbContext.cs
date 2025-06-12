@@ -8,12 +8,33 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+    
+    public ApplicationDbContext()
+    {
+    }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json")
+                .Build();
 
+            var connectionString = config.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseNpgsql(connectionString);
+            
+        }
+        base.OnConfiguring(optionsBuilder);
+    }
+
+    public DbSet<Recipe> Recipes { get; set; }
+    public DbSet<Ingredient> Ingredients { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        // Customize the ASP.NET Identity model and override the defaults if needed.
-        // For example, you can rename the ASP.NET Identity table names and more.
-        // Add your customizations after calling base.OnModelCreating(builder);
+        // Customizations here
     }
 }

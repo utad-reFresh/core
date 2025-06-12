@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace utad.reFresh.core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250612032015_AddRecipe")]
+    partial class AddRecipe
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,58 +227,6 @@ namespace utad.reFresh.core.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("utad.reFresh.core.Models.Equipment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("RecipeId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("Equipment");
-                });
-
-            modelBuilder.Entity("utad.reFresh.core.Models.Ingredient", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("RecipeId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("Ingredients");
-                });
-
             modelBuilder.Entity("utad.reFresh.core.Models.Recipe", b =>
                 {
                     b.Property<int>("Id")
@@ -283,20 +234,6 @@ namespace utad.reFresh.core.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Instructions")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<double>("PricePerServing")
-                        .HasColumnType("double precision");
 
                     b.Property<string>("Summary")
                         .IsRequired()
@@ -360,27 +297,6 @@ namespace utad.reFresh.core.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("utad.reFresh.core.Models.Equipment", b =>
-                {
-                    b.HasOne("utad.reFresh.core.Models.Recipe", null)
-                        .WithMany("Equipment")
-                        .HasForeignKey("RecipeId");
-                });
-
-            modelBuilder.Entity("utad.reFresh.core.Models.Ingredient", b =>
-                {
-                    b.HasOne("utad.reFresh.core.Models.Recipe", null)
-                        .WithMany("Ingredients")
-                        .HasForeignKey("RecipeId");
-                });
-
-            modelBuilder.Entity("utad.reFresh.core.Models.Recipe", b =>
-                {
-                    b.Navigation("Equipment");
-
-                    b.Navigation("Ingredients");
                 });
 #pragma warning restore 612, 618
         }
