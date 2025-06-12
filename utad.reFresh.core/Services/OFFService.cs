@@ -1,4 +1,4 @@
-﻿// utad.reFresh.core/Services/OpenFoodFactsService.cs
+// utad.reFresh.core/Services/OpenFoodFactsService.cs
 
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
