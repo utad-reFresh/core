@@ -1,9 +1,27 @@
 ﻿@page
 @model utad.reFresh.core.Pages.IndexModel
+@inject Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper Html
+
 @{
+    var request = Html.ViewContext.HttpContext.Request;
+    var apkUrl = $"{request.Scheme}://{request.Host}/apks/latest.apk";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>
+        Download the app: <a href="@apkUrl">latest.apk</a>
+    </p>
+    <div id="qrcode"></div>
 </div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        new QRCode(document.getElementById("qrcode"), {
+            text: "@apkUrl",
+            width: 128,
+            height: 128
+        });
+    </script>
+}
