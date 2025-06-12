@@ -8,9 +8,9 @@ namespace utad.reFresh.core.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class DownloadApp(IConfiguration configuration) : ControllerBase
+public class DownloadApp(IConfiguration configuration, IWebHostEnvironment env) : ControllerBase
 {
-    private readonly IWebHostEnvironment _env;
+    private readonly IWebHostEnvironment _env = env;
     private readonly IConfiguration Configuration = configuration;
 
     [HttpPost("ghw")]
