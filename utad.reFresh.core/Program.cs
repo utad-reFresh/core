@@ -61,6 +61,8 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddHttpClient<SpoonacularService>();
 builder.Services.AddScoped<SpoonacularService>();
+builder.Services.AddHttpClient<OFFService>();
+builder.Services.AddScoped<OFFService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRazorPages();
