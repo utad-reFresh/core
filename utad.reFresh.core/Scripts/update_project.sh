@@ -1,13 +1,19 @@
 ﻿#!/bin/bash
 
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+export ANDROID_SDK_ROOT=/opt/android-sdk
+
 # Caminhos
 REPO_DIR="/opt/projetos/refresh"
 SITE_APK_DIR="/var/www/refresh/wwwroot/apks"
 LOG_FILE="/var/log/refresh_build.log"
 
+COMMIT_HASH=$(git rev-parse --short HEAD)
+
 # Timestamp
 TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
-APK_NAME="app-release-$TIMESTAMP.apk"
+APK_NAME="refresh-${TIMESTAMP}-${COMMIT_HASH}.apk"
 
 # Início do log
 echo "=== Build iniciado em $(date) ===" >> "$LOG_FILE"
@@ -37,12 +43,14 @@ if [ $BUILD_STATUS -ne 0 ]; then
 fi
 
 # Move o APK com nome baseado no timestamp
-APK_ORIGINAL="$REPO_DIR/app/build/outputs/apk/release/app-release.apk"
+APK_ORIGINAL="$REPO_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
 APK_DEST="$SITE_APK_DIR/$APK_NAME"
+APK_LATEST="$SITE_APK_DIR/latest.apk"
 
 if [ -f "$APK_ORIGINAL" ]; then
   cp "$APK_ORIGINAL" "$APK_DEST"
-  echo "✓ APK copiado para: $APK_DEST" >> "$LOG_FILE"
+  cp "$APK_ORIGINAL" "$APK_LATEST"
+  echo "✓ APK copiado para: $APK_DEST e $APK_LATEST" >> "$LOG_FILE"
 else
   echo "[ERRO] APK não encontrado em $APK_ORIGINAL" >> "$LOG_FILE"
   exit 1

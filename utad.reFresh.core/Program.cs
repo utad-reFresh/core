@@ -77,8 +77,13 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseAuthentication();
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider
+    {
+        Mappings = { [".apk"] = "application/vnd.android.package-archive" }
+    }
+});app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

@@ -365,3 +365,5 @@ FodyWeavers.xsd
 utad.reFresh.core/appsettings.json
 
 utad.reFresh.core/wwwroot/gitversion.txt
+
+utad.reFresh.core/wwwroot/apks/
