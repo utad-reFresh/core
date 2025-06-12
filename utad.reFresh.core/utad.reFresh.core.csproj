@@ -33,8 +33,18 @@
     <Folder Include="wwwroot\apks\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Scripts\update_project.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  
+  
   <Target Name="GenerateGitVersion" AfterTargets="Build">
     <Exec Command="git rev-parse --short HEAD &gt; $(ProjectDir)wwwroot\gitversion.txt" />
   </Target>
+  
+  
   
 </Project>
