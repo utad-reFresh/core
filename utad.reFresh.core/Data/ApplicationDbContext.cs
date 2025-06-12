@@ -40,6 +40,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     
     public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
     public DbSet<RecipeStep> RecipeSteps { get; set; }
+    public DbSet<OpenFoodFactsProductSearch> OpenFoodFactsProductSearches { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder builder)
