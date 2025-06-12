@@ -120,10 +120,14 @@ public class RecipeController : ControllerBase
                         // Ensure ingredients are saved
                         foreach (var ingredient in recipe.Ingredients)
                         {
-                            var ingredientExists = await _db.Ingredients.AnyAsync(i => i.Id == ingredient.Id);
+                            var ingredientExists = await _db.Ingredients.AnyAsync(i => i.Id == ingredient.Ingredient.Id);
                             if (!ingredientExists)
                             {
                                 _db.Ingredients.Add(ingredient.Ingredient);
+                            }
+                            else
+                            {
+                                _db.Ingredients.Attach(ingredient.Ingredient);
                             }
                         }
                         // Ensure equipment is saved
