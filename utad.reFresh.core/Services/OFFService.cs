@@ -57,8 +57,14 @@ public class OFFService
         AddIfNotEmpty(genericNameEn);
 
         // Remove duplicates
-        searchTerms = searchTerms.Distinct().ToList();
-
+        // Remove empty and duplicate terms, limit to 3
+        searchTerms = searchTerms
+            .Where(t => !string.IsNullOrWhiteSpace(t))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(5)
+            .ToList();
+        
+        
         var foundIngredients = new List<Ingredient>();
         foreach (var term in searchTerms)
         {
