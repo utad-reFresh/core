@@ -171,8 +171,7 @@ public class AccountController(
             userIngredient.Quantity = model.Quantity;
             if (model.IsFavorite.HasValue)
                 userIngredient.isFavorite = model.IsFavorite.Value;
-            if (model.ExpirationDate.HasValue)
-                userIngredient.ExpirationDate = model.ExpirationDate;
+            userIngredient.ExpirationDate = model.ExpirationDate;
         }
 
         await db.SaveChangesAsync();
