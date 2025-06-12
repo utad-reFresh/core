@@ -51,7 +51,7 @@ if [ $BUILD_STATUS -ne 0 ]; then
 fi
 
 # Move o APK com nome baseado no timestamp
-APK_ORIGINAL="$REPO_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+APK_ORIGINAL="$REPO_DIR/app/build/outputs/apk/release/app-release.apk"
 APK_DEST="$SITE_APK_DIR/$APK_NAME"
 APK_LATEST="$SITE_APK_DIR/latest.apk"
 

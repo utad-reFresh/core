@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace utad.reFresh.core.Controllers;
@@ -127,6 +128,128 @@ public class AccountController(
            user.PhotoUrl
         });
     }
+    
+    public class UpdateIngredientModel
+    {
+        public int Quantity { get; set; }
+        public bool? IsFavorite { get; set; }
+        public DateTime? ExpirationDate { get; set; }
+    }
+    
+    [HttpPost("me/ingredient/{ingredientId}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> UpdateMyIngredient(int ingredientId, [FromBody] UpdateIngredientModel model, [FromServices] ApplicationDbContext db)
+    {
+        if (model.Quantity < 0)
+            return BadRequest("Quantity cannot be negative.");
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Unauthorized("Authenticated user not found.");
+
+        var ingredient = await db.Ingredients.FindAsync(ingredientId);
+        if (ingredient == null)
+            return NotFound("Ingredient not found.");
+
+        var userIngredient = await db.UserIngredients
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.IngredientId == ingredientId);
+
+        if (userIngredient == null)
+        {
+            userIngredient = new UserIngredient
+            {
+                UserId = user.Id,
+                IngredientId = ingredientId,
+                Quantity = model.Quantity,
+                isFavorite = model.IsFavorite ?? false,
+                ExpirationDate = model.ExpirationDate
+            };
+            db.UserIngredients.Add(userIngredient);
+        }
+        else
+        {
+            userIngredient.Quantity = model.Quantity;
+            if (model.IsFavorite.HasValue)
+                userIngredient.isFavorite = model.IsFavorite.Value;
+            if (model.ExpirationDate.HasValue)
+                userIngredient.ExpirationDate = model.ExpirationDate;
+        }
+
+        await db.SaveChangesAsync();
+        return Ok(new { ingredientId, model.Quantity, model.IsFavorite, model.ExpirationDate });
+    }
+    
+    [HttpGet("me/ingredients")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> GetMyIngredients([FromServices] ApplicationDbContext db)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Unauthorized("Authenticated user not found.");
+
+        var ingredients = await db.UserIngredients
+            .Where(ui => ui.UserId == user.Id)
+            .Include(ui => ui.Ingredient)
+            .Select(ui => new
+            {
+                ui.Ingredient.Id,
+                ui.Ingredient.Name,
+                ui.Ingredient.ImageUrl,
+                ui.Quantity,
+                ui.isFavorite,
+                ui.ExpirationDate
+            })
+            .ToListAsync();
+
+        return Ok(ingredients);
+    }
+    
+    [HttpDelete("me/ingredient/{ingredientId}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> RemoveMyIngredient(int ingredientId, [FromServices] ApplicationDbContext db)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Unauthorized("Authenticated user not found.");
+
+        var userIngredient = await db.UserIngredients
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.IngredientId == ingredientId);
+
+        if (userIngredient == null)
+            return NotFound("Ingredient not found for user.");
+
+        db.UserIngredients.Remove(userIngredient);
+        await db.SaveChangesAsync();
+
+        return Ok(new { message = "Ingredient removed from user." });
+    }
+    
+    [HttpGet("me/ingredient/{ingredientId}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> GetMyIngredient(int ingredientId, [FromServices] ApplicationDbContext db)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Unauthorized("Authenticated user not found.");
+
+        var userIngredient = await db.UserIngredients
+            .Include(ui => ui.Ingredient)
+            .FirstOrDefaultAsync(ui => ui.UserId == user.Id && ui.IngredientId == ingredientId);
+
+        if (userIngredient == null)
+            return NotFound("Ingredient not found for user.");
+
+        return Ok(new
+        {
+            userIngredient.Ingredient.Id,
+            userIngredient.Ingredient.Name,
+            userIngredient.Ingredient.ImageUrl,
+            userIngredient.Quantity,
+            userIngredient.isFavorite,
+            userIngredient.ExpirationDate
+        });
+    }
+    
     
     [HttpPost("changePassword")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

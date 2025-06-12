@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace utad.reFresh.core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250612193408_recipeovrehaul2")]
+    partial class recipeovrehaul2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -312,22 +315,23 @@ namespace utad.reFresh.core.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AggregateLikes")
+                    b.Property<int>("AggregateLikes")
                         .HasColumnType("integer");
 
-                    b.Property<bool?>("Cheap")
+                    b.Property<bool>("Cheap")
                         .HasColumnType("boolean");
 
                     b.Property<int?>("CookingMinutes")
                         .HasColumnType("integer");
 
                     b.Property<string>("CreditsText")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.PrimitiveCollection<List<string>>("Cuisines")
                         .HasColumnType("text[]");
 
-                    b.Property<bool?>("DairyFree")
+                    b.Property<bool>("DairyFree")
                         .HasColumnType("boolean");
 
                     b.PrimitiveCollection<List<string>>("Diets")
@@ -336,22 +340,24 @@ namespace utad.reFresh.core.Migrations
                     b.PrimitiveCollection<List<string>>("DishTypes")
                         .HasColumnType("text[]");
 
-                    b.Property<bool?>("GlutenFree")
+                    b.Property<bool>("GlutenFree")
                         .HasColumnType("boolean");
 
-                    b.Property<double?>("HealthScore")
+                    b.Property<double>("HealthScore")
                         .HasColumnType("double precision");
 
                     b.Property<string>("ImageType")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool?>("LowFodmap")
+                    b.Property<bool>("LowFodmap")
                         .HasColumnType("boolean");
 
                     b.PrimitiveCollection<List<string>>("Occasions")
@@ -360,19 +366,21 @@ namespace utad.reFresh.core.Migrations
                     b.Property<int?>("PreparationMinutes")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ReadyInMinutes")
+                    b.Property<int>("ReadyInMinutes")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Servings")
+                    b.Property<int>("Servings")
                         .HasColumnType("integer");
 
                     b.Property<string>("SourceName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("SourceUrl")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double?>("SpoonacularScore")
+                    b.Property<double>("SpoonacularScore")
                         .HasColumnType("double precision");
 
                     b.Property<string>("SpoonacularSourceUrl")
@@ -383,26 +391,26 @@ namespace utad.reFresh.core.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool?>("Sustainable")
+                    b.Property<bool>("Sustainable")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool?>("Vegan")
+                    b.Property<bool>("Vegan")
                         .HasColumnType("boolean");
 
-                    b.Property<bool?>("Vegetarian")
+                    b.Property<bool>("Vegetarian")
                         .HasColumnType("boolean");
 
-                    b.Property<bool?>("VeryHealthy")
+                    b.Property<bool>("VeryHealthy")
                         .HasColumnType("boolean");
 
-                    b.Property<bool?>("VeryPopular")
+                    b.Property<bool>("VeryPopular")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("WeightWatcherSmartPoints")
+                    b.Property<int>("WeightWatcherSmartPoints")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
