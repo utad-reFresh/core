@@ -58,7 +58,7 @@ public class RecipeController : ControllerBase
             }).ToList(),
             Ingredients = recipe.Ingredients.Select(i => new IngredientDto
             {
-                Id = i.Id,
+                Id = i.IngredientId,
                 Name = i.Name,
                 ImageUrl = i.Ingredient.ImageUrl
             }).ToList(),
