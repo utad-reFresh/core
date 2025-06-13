@@ -52,6 +52,21 @@ builder.Services.AddAuthentication(options =>
             ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException()))
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+                var user = await userManager.GetUserAsync(context.Principal);
+                var securityStamp = context.Principal.FindFirst("AspNet.Identity.SecurityStamp")?.Value;
+
+                if (user == null || user.SecurityStamp != securityStamp)
+                {
+                    context.Fail("Token is no longer valid.");
+                }
+            }
+        };
+
     });
 
 // builder.Services.AddControllers();
