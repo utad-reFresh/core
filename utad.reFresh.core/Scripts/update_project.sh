@@ -58,10 +58,12 @@ APK_LATEST="$SITE_APK_DIR/latest.apk"
 if [ -f "$APK_ORIGINAL" ]; then
   cp "$APK_ORIGINAL" "$APK_DEST"
   cp "$APK_ORIGINAL" "$APK_LATEST"
+  echo "$COMMIT_HASH" > "$SITE_APK_DIR/version.txt"
   echo "✓ APK copiado para: $APK_DEST e $APK_LATEST" >> "$LOG_FILE"
 else
   echo "[ERRO] APK não encontrado em $APK_ORIGINAL" >> "$LOG_FILE"
   exit 1
 fi
+
 
 echo "=== Build finalizado com sucesso em $(date) ===" >> "$LOG_FILE"
