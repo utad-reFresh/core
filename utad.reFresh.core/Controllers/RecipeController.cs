@@ -66,7 +66,7 @@ public class RecipeController : ControllerBase
             .Select(r => new
             {
                 Id = r.Id,
-                Name = r.Title,
+                Title = r.Title,
                 ImageUrl = r.ImageUrl
             })
             .ToListAsync();
@@ -92,7 +92,7 @@ public class RecipeController : ControllerBase
             .Select(r => new
             {
                 Id = r.Id,
-                Name = r.Title,
+                Title = r.Title,
                 ImageUrl = r.ImageUrl
             })
             .ToListAsync();
@@ -268,7 +268,7 @@ public class RecipeController : ControllerBase
             .Select(r => new
             {
                 Id = r.Id,
-                Name = r.Title,
+                Title = r.Title,
                 ImageUrl = r.ImageUrl
             })
             .ToListAsync();
