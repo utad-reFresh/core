@@ -66,12 +66,13 @@ public class RecipeController : ControllerBase
             .Select(r => new
             {
                 Id = r.Id,
-                Name = r.Title.ToLower(),
+                Name = r.Title,
                 ImageUrl = r.ImageUrl
             })
             .ToListAsync();
 
-        if (recipes.Any())
+        // se houver pelo menos 10, retorna
+        if (recipes.Count >= 10)
             return Ok(recipes);
 
         // 2. If not found, call SearchRecipes to fetch and save from Spoonacular
@@ -91,7 +92,7 @@ public class RecipeController : ControllerBase
             .Select(r => new
             {
                 Id = r.Id,
-                Name = r.Title.ToLower(),
+                Name = r.Title,
                 ImageUrl = r.ImageUrl
             })
             .ToListAsync();
