@@ -62,6 +62,18 @@ public class RecipeController : ControllerBase
                 Name = i.Name,
                 ImageUrl = i.Ingredient.ImageUrl
             }).ToList(),
+            IngredientDets = recipe.Ingredients.Select(i => new RecipeIngredientDto
+            {
+                Id = i.IngredientId,
+                Name = i.Name,
+                ImageUrl = i.Ingredient.ImageUrl,
+                AmountMetric = i.AmountMetric,
+                UnitShortMetric = i.UnitShortMetric,
+                UnitLongMetric = i.UnitLongMetric,
+                AmountImperial = i.AmountImperial,
+                UnitShortImperial = i.UnitShortImperial,
+                UnitLongImperial = i.UnitLongImperial
+            }).ToList(),
             Equipment = recipe.Equipment.Select(e => new EquipmentDto
             {
                 Id = e.Id,
@@ -183,6 +195,7 @@ public class RecipeController : ControllerBase
         public string Summary { get; set; }
         public List<RecipeStepDto> Steps { get; set; }
         public List<IngredientDto> Ingredients { get; set; }
+        public List<RecipeIngredientDto> IngredientDets { get; set; }
         public List<EquipmentDto> Equipment { get; set; }
         public string? SourceUrl { get; set; }
         public string SpoonacularSourceUrl { get; set; }
@@ -299,5 +312,18 @@ public class RecipeController : ControllerBase
         public int Id { get; set; }
         public string Name { get; set; }
         public string ImageUrl { get; set; }
+    }
+    
+    public class RecipeIngredientDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string ImageUrl { get; set; }
+        public double AmountMetric { get; set; }
+        public string UnitShortMetric { get; set; }
+        public string UnitLongMetric { get; set; }
+        public double AmountImperial { get; set; }
+        public string UnitShortImperial { get; set; }
+        public string UnitLongImperial { get; set; }
     }
 }
