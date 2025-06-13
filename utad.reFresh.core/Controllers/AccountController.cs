@@ -58,8 +58,15 @@ public class AccountController(
                 protocol: Request.Scheme
                 );
             
+            
+            
+            if (user.NormalizedEmail == null)
+            {
+                return BadRequest("Erro de registo");
+            }
+            
 
-            await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
+            await _emailSender.SendEmailAsync(user.NormalizedEmail, "Confirm your email",
                 $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>.");
 
             return Ok();
@@ -284,7 +291,12 @@ public class AccountController(
             values: new { area = "Identity", code = code },
             protocol: Request.Scheme);
         
-        await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+        if (user.NormalizedEmail == null)
+        {
+            return BadRequest("Error sending recovery email");
+        }
+        
+        await _emailSender.SendEmailAsync(user.NormalizedEmail, "Reset Password",
             $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>.");
 
         return Ok("Recovery email sent.");
