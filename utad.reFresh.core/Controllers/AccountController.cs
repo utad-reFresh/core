@@ -219,6 +219,68 @@ public class AccountController(
         return Ok(ingredients);
     }
     
+    [HttpGet("me/favoriteRecipes")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> GetFavoriteRecipes([FromServices] ApplicationDbContext db)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Unauthorized("Authenticated user not found.");
+
+        var favorites = await db.UserFavoriteRecipes
+            .Where(f => f.UserId == user.Id)
+            .Include(f => f.Recipe)
+            .Select(f => new
+            {
+                f.Recipe.Id,
+                f.Recipe.Title,
+                f.Recipe.ImageUrl
+            })
+            .ToListAsync();
+
+        return Ok(favorites);
+    }
+
+    [HttpPost("me/favoriteRecipe/{recipeId}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> AddFavoriteRecipe(int recipeId, [FromServices] ApplicationDbContext db)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Unauthorized("Authenticated user not found.");
+
+        var exists = await db.UserFavoriteRecipes.AnyAsync(f => f.UserId == user.Id && f.RecipeId == recipeId);
+        if (exists)
+            return BadRequest("Recipe already favorited.");
+
+        db.UserFavoriteRecipes.Add(new UserFavoriteRecipe
+        {
+            UserId = user.Id,
+            RecipeId = recipeId
+        });
+        await db.SaveChangesAsync();
+        return Ok("Recipe favorited.");
+    }
+
+    [HttpDelete("me/favoriteRecipe/{recipeId}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> RemoveFavoriteRecipe(int recipeId, [FromServices] ApplicationDbContext db)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Unauthorized("Authenticated user not found.");
+
+        var favorite = await db.UserFavoriteRecipes
+            .FirstOrDefaultAsync(f => f.UserId == user.Id && f.RecipeId == recipeId);
+
+        if (favorite == null)
+            return NotFound("Recipe not favorited.");
+
+        db.UserFavoriteRecipes.Remove(favorite);
+        await db.SaveChangesAsync();
+        return Ok("Recipe unfavorited.");
+    }
+    
     [HttpDelete("me/ingredient/{ingredientId}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> RemoveMyIngredient(int ingredientId, [FromServices] ApplicationDbContext db)

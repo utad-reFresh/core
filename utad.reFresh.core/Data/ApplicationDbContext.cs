@@ -42,12 +42,24 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<RecipeStep> RecipeSteps { get; set; }
     public DbSet<OpenFoodFactsProductSearch> OpenFoodFactsProductSearches { get; set; }
 
+    public DbSet<UserFavoriteRecipe> UserFavoriteRecipes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        // RecipeIngredient: composite key
+        builder.Entity<UserFavoriteRecipe>()
+            .HasKey(uf => new { uf.UserId, uf.RecipeId });
+        builder.Entity<UserFavoriteRecipe>()
+            .HasOne(uf => uf.User)
+            .WithMany()
+            .HasForeignKey(uf => uf.UserId);
+        
+        builder.Entity<UserFavoriteRecipe>()
+            .HasOne(uf => uf.Recipe)
+            .WithMany()
+            .HasForeignKey(uf => uf.RecipeId);
+    
         builder.Entity<RecipeIngredient>()
             .HasKey(ri => new { ri.RecipeId, ri.IngredientId });
 
