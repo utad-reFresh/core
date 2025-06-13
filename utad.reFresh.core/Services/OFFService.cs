@@ -79,10 +79,17 @@ public class OFFService
 
         var search = new OpenFoodFactsProductSearch
         {
-            Barcode = (string)product.code,
-            ProductName = (string)product.product_name,
+            Barcode = (string)product.code ?? string.Empty,
+            ProductName = (string)product.product_name ?? string.Empty,
             Ingredients = foundIngredients
         };
+        
+        if (string.IsNullOrWhiteSpace(search.Barcode))
+            throw new ArgumentException("Product code is required.");
+        
+        if (string.IsNullOrWhiteSpace(search.ProductName))
+            throw new ArgumentException("Product name is required.");
+        
         _db.OpenFoodFactsProductSearches.Add(search);
         await _db.SaveChangesAsync();
         return search;

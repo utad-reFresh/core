@@ -36,6 +36,12 @@ public class AccountController(
         var user = new ApplicationUser { UserName = model.Email, Email = model.Email, DisplayName = model.DisplayName };
         var result = await _userManager.CreateAsync(user, model.Password);
 
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => e.Description).ToList();
+            return BadRequest(new { errors });
+        }
+        
         if (result.Succeeded)
         {
             var userId = await _userManager.GetUserIdAsync(user);
@@ -86,6 +92,8 @@ public class AccountController(
         if (!await _userManager.CheckPasswordAsync(puser, model.Password))
             return BadRequest(new { error = "Wrong password" });
 
+        if (!await _userManager.IsEmailConfirmedAsync(puser))
+            return BadRequest(new { error = "Please confirm your email before logging in." });
         
         var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
 
