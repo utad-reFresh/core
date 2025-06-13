@@ -24,92 +24,7 @@ public class RecipeController : ControllerBase
     }
 
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetRecipe(int id)
-    {
-        var recipe = await _db.Recipes
-            .Include(r => r.Ingredients)
-                .ThenInclude(i => i.Ingredient)
-            .Include(r => r.Equipment)
-            .Include(r => r.Steps)
-            .FirstOrDefaultAsync(r => r.Id == id);
-
-        if (recipe == null)
-        {
-            recipe = await _spoonacularService.GetRecipeAsync(id);
-            if (recipe == null) return NotFound();
-
-            _db.Recipes.Add(recipe);
-            await _db.SaveChangesAsync();
-        }
-        
-        
-        // Map to DTO to avoid cycles
-        var recipeDto = new RecipeDto
-        {
-            Id = recipe.Id,
-            Title = recipe.Title,
-            ImageUrl = recipe.ImageUrl,
-            Summary = recipe.Summary,
-            Steps = recipe.Steps.Select(s => new RecipeStepDto
-            {
-                Number = s.Number,
-                Step = s.Step
-            }).ToList(),
-            Ingredients = recipe.Ingredients.Select(i => new IngredientDto
-            {
-                Id = i.IngredientId,
-                Name = i.Name,
-                ImageUrl = i.Ingredient.ImageUrl
-            }).ToList(),
-            IngredientDets = recipe.Ingredients.Select(i => new RecipeIngredientDto
-            {
-                Id = i.IngredientId,
-                Name = i.Name,
-                ImageUrl = i.Ingredient.ImageUrl,
-                AmountMetric = i.AmountMetric,
-                UnitShortMetric = i.UnitShortMetric,
-                UnitLongMetric = i.UnitLongMetric,
-                AmountImperial = i.AmountImperial,
-                UnitShortImperial = i.UnitShortImperial,
-                UnitLongImperial = i.UnitLongImperial
-            }).ToList(),
-            Equipment = recipe.Equipment.Select(e => new EquipmentDto
-            {
-                Id = e.Id,
-                Name = e.Name,
-                ImageUrl = e.ImageUrl
-            }).ToList(),
-            SourceUrl = recipe.SourceUrl,
-            SpoonacularSourceUrl = recipe.SpoonacularSourceUrl,
-            Vegetarian = recipe.Vegetarian,
-            Vegan = recipe.Vegan,
-            GlutenFree = recipe.GlutenFree,
-            DairyFree = recipe.DairyFree,
-            VeryHealthy = recipe.VeryHealthy,
-            Cheap = recipe.Cheap,
-            VeryPopular = recipe.VeryPopular,
-            Sustainable = recipe.Sustainable,
-            LowFodmap = recipe.LowFodmap,
-            PreparationMinutes = recipe.PreparationMinutes,
-            CookingMinutes = recipe.CookingMinutes,
-            ReadyInMinutes = recipe.ReadyInMinutes,
-            Servings = recipe.Servings,
-            HealthScore = recipe.HealthScore,
-            AggregateLikes = recipe.AggregateLikes,
-            WeightWatcherSmartPoints = recipe.WeightWatcherSmartPoints,
-            CreditsText = recipe.CreditsText,
-            SourceName = recipe.SourceName,
-            Cuisines = recipe.Cuisines,
-            DishTypes = recipe.DishTypes,
-            Diets = recipe.Diets,
-            Occasions = recipe.Occasions,
-            SpoonacularScore = recipe.SpoonacularScore,
-            LastUpdated = recipe.LastUpdated
-        };
-
-        return Ok(recipeDto);
-    }
+  
     
     public class SpoonacularRecipeSearchResponse
     {
@@ -348,6 +263,93 @@ public class RecipeController : ControllerBase
             .ToListAsync();
 
         return Ok(recipes);
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetRecipe(int id)
+    {
+        var recipe = await _db.Recipes
+            .Include(r => r.Ingredients)
+                .ThenInclude(i => i.Ingredient)
+            .Include(r => r.Equipment)
+            .Include(r => r.Steps)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (recipe == null)
+        {
+            recipe = await _spoonacularService.GetRecipeAsync(id);
+            if (recipe == null) return NotFound();
+
+            _db.Recipes.Add(recipe);
+            await _db.SaveChangesAsync();
+        }
+        
+        
+        // Map to DTO to avoid cycles
+        var recipeDto = new RecipeDto
+        {
+            Id = recipe.Id,
+            Title = recipe.Title,
+            ImageUrl = recipe.ImageUrl,
+            Summary = recipe.Summary,
+            Steps = recipe.Steps.Select(s => new RecipeStepDto
+            {
+                Number = s.Number,
+                Step = s.Step
+            }).ToList(),
+            Ingredients = recipe.Ingredients.Select(i => new IngredientDto
+            {
+                Id = i.IngredientId,
+                Name = i.Name,
+                ImageUrl = i.Ingredient.ImageUrl
+            }).ToList(),
+            IngredientDets = recipe.Ingredients.Select(i => new RecipeIngredientDto
+            {
+                Id = i.IngredientId,
+                Name = i.Name,
+                ImageUrl = i.Ingredient.ImageUrl,
+                AmountMetric = i.AmountMetric,
+                UnitShortMetric = i.UnitShortMetric,
+                UnitLongMetric = i.UnitLongMetric,
+                AmountImperial = i.AmountImperial,
+                UnitShortImperial = i.UnitShortImperial,
+                UnitLongImperial = i.UnitLongImperial
+            }).ToList(),
+            Equipment = recipe.Equipment.Select(e => new EquipmentDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                ImageUrl = e.ImageUrl
+            }).ToList(),
+            SourceUrl = recipe.SourceUrl,
+            SpoonacularSourceUrl = recipe.SpoonacularSourceUrl,
+            Vegetarian = recipe.Vegetarian,
+            Vegan = recipe.Vegan,
+            GlutenFree = recipe.GlutenFree,
+            DairyFree = recipe.DairyFree,
+            VeryHealthy = recipe.VeryHealthy,
+            Cheap = recipe.Cheap,
+            VeryPopular = recipe.VeryPopular,
+            Sustainable = recipe.Sustainable,
+            LowFodmap = recipe.LowFodmap,
+            PreparationMinutes = recipe.PreparationMinutes,
+            CookingMinutes = recipe.CookingMinutes,
+            ReadyInMinutes = recipe.ReadyInMinutes,
+            Servings = recipe.Servings,
+            HealthScore = recipe.HealthScore,
+            AggregateLikes = recipe.AggregateLikes,
+            WeightWatcherSmartPoints = recipe.WeightWatcherSmartPoints,
+            CreditsText = recipe.CreditsText,
+            SourceName = recipe.SourceName,
+            Cuisines = recipe.Cuisines,
+            DishTypes = recipe.DishTypes,
+            Diets = recipe.Diets,
+            Occasions = recipe.Occasions,
+            SpoonacularScore = recipe.SpoonacularScore,
+            LastUpdated = recipe.LastUpdated
+        };
+
+        return Ok(recipeDto);
     }
 
     
