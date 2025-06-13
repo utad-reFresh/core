@@ -4,20 +4,89 @@
     ViewData["Title"] = "Register confirmation";
 }
 
-<h1>@ViewData["Title"]</h1>
-@{
-    if (@Model.DisplayConfirmAccountLink)
-    {
-<p>
-    This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-    Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
-</p>
+<style>
+    /* Remove o cartão do layout principal só nesta página */
+    .container.main-content {
+        background: transparent !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        max-width: 100% !important;
     }
-    else
-    {
-<p>
-        Please check your email to confirm your account.
-</p>
-    }
-}
 
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .confirmation-container {
+        flex: 1 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 3rem; /* Espaço visual acima do footer */
+    }
+
+    .confirmation-card {
+        background: #fff;
+        border-radius: 22px;
+        box-shadow: 0 4px 24px rgba(56, 142, 60, 0.13);
+        padding: 2.5rem 2.5rem 2rem 2.5rem;
+        max-width: 500px;
+        width: 100%;
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+        .confirmation-card h1 {
+            color: #388e3c;
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+
+        .confirmation-card p, .confirmation-card a {
+            font-size: 1.08rem;
+            color: #388e3c;
+        }
+
+        .confirmation-card a {
+            color: #2e7031;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+            .confirmation-card a:hover {
+                color: #388e3c;
+                text-decoration: none;
+            }
+</style>
+
+<div class="confirmation-container">
+    <div class="confirmation-card">
+        <h1>@ViewData["Title"]</h1>
+        @{
+            if (@Model.DisplayConfirmAccountLink)
+            {
+                <p>
+                    This app does not currently have a real email sender registered, see
+                    <a href="https://aka.ms/aspaccountconf" target="_blank">these docs</a>
+                    for how to configure a real email sender.<br />
+                    Normally this would be emailed:
+                    <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
+                </p>
+            }
+            else
+            {
+                <p>
+                    Please check your email to confirm your account.
+                </p>
+            }
+        }
+    </div>
+</div>
