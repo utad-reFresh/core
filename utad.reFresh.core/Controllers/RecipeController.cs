@@ -52,14 +52,21 @@ public class RecipeController : ControllerBase
         if (string.IsNullOrWhiteSpace(query))
             return BadRequest("Query cannot be empty.");
 
+        query = query.ToLower().Trim();
+
         // 1. Try to find recipes in the database
         var recipes = await _db.Recipes
-            .Where(r => r.Title.Contains(query))
+            .Include(r => r.Ingredients)
+            .ThenInclude(i => i.Ingredient)
+            .Where(r =>
+                r.Title.ToLower().Contains(query) ||
+                r.Ingredients.Any(i => i.Name.ToLower().Contains(query) || i.Ingredient.Name.ToLower().Contains(query))
+            )
             .OrderByDescending(r => r.SpoonacularScore)
             .Select(r => new
             {
                 Id = r.Id,
-                Name = r.Title,
+                Name = r.Title.ToLower(),
                 ImageUrl = r.ImageUrl
             })
             .ToListAsync();
@@ -70,16 +77,21 @@ public class RecipeController : ControllerBase
         // 2. If not found, call SearchRecipes to fetch and save from Spoonacular
         var searchResult = await SearchRecipes(query) as OkObjectResult;
         if (searchResult == null)
-            return NotFound("No recipes found.");
+            return NotFound("No recipes found (spoonacular).");
 
         // 3. Try to find recipes again after saving
         recipes = await _db.Recipes
-            .Where(r => r.Title.Contains(query))
+            .Include(r => r.Ingredients)
+            .ThenInclude(i => i.Ingredient)
+            .Where(r =>
+                r.Title.ToLower().Contains(query) ||
+                r.Ingredients.Any(i => i.Name.ToLower().Contains(query) || i.Ingredient.Name.ToLower().Contains(query))
+            )
             .OrderByDescending(r => r.SpoonacularScore)
             .Select(r => new
             {
                 Id = r.Id,
-                Name = r.Title,
+                Name = r.Title.ToLower(),
                 ImageUrl = r.ImageUrl
             })
             .ToListAsync();
@@ -87,7 +99,7 @@ public class RecipeController : ControllerBase
         if (recipes.Any())
             return Ok(recipes);
 
-        return NotFound("No recipes found.");
+        return NotFound("No recipes found (lr).");
     }
 
     [HttpGet("search")]
