@@ -277,6 +277,21 @@ public class RecipeController : ControllerBase
 
     }
     
+    [HttpGet("list")]
+    public async Task<IActionResult> GetRecipeList()
+    {
+        var recipes = await _db.Recipes
+            .OrderByDescending(r => r.SpoonacularScore)
+            .Select(r => new
+            {
+                Id = r.Id,
+                Name = r.Title,
+                ImageUrl = r.ImageUrl
+            })
+            .ToListAsync();
+
+        return Ok(recipes);
+    }
 
     
     public class IngredientDto

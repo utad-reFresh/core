@@ -36,6 +36,8 @@ echo "→ Git pull..." >> "$LOG_FILE"
 git reset --hard >> "$LOG_FILE" 2>&1
 git pull origin main >> "$LOG_FILE" 2>&1
 
+sleep 5
+
 chmod +x gradlew
 echo "→ Diretório atual: $(pwd)" >> "$LOG_FILE"
 echo "→ Existe gradlew? $(ls -l gradlew)" >> "$LOG_FILE"
