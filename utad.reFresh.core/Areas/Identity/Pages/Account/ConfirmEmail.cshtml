@@ -4,5 +4,55 @@
     ViewData["Title"] = "Confirm email";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<style>
+    /* Remove o cartão do layout principal só nesta página */
+    .container.main-content {
+        background: transparent !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        max-width: 100% !important;
+    }
+
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .confirm-container {
+        flex: 1 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 3rem; /* Espaço visual acima do footer */
+    }
+
+    .confirm-card {
+        background: #fff;
+        border-radius: 22px;
+        box-shadow: 0 4px 24px rgba(56, 142, 60, 0.13);
+        padding: 2.5rem 2.5rem 2rem 2.5rem;
+        max-width: 500px;
+        width: 100%;
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+        .confirm-card h1 {
+            color: #388e3c;
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+</style>
+
+<div class="confirm-container">
+    <div class="confirm-card">
+        <h1>@ViewData["Title"]</h1>
+        <partial name="_StatusMessage" model="Model.StatusMessage" />
+    </div>
+</div>
