@@ -22,9 +22,7 @@ public class RecipeController : ControllerBase
         _spoonacularService = spoonacularService;
         _db = db;
     }
-
-
-  
+    
     
     public class SpoonacularRecipeSearchResponse
     {
