@@ -67,7 +67,33 @@ public class RecipeController : ControllerBase
                 Id = e.Id,
                 Name = e.Name,
                 ImageUrl = e.ImageUrl
-            }).ToList()
+            }).ToList(),
+            SourceUrl = recipe.SourceUrl,
+            SpoonacularSourceUrl = recipe.SpoonacularSourceUrl,
+            Vegetarian = recipe.Vegetarian,
+            Vegan = recipe.Vegan,
+            GlutenFree = recipe.GlutenFree,
+            DairyFree = recipe.DairyFree,
+            VeryHealthy = recipe.VeryHealthy,
+            Cheap = recipe.Cheap,
+            VeryPopular = recipe.VeryPopular,
+            Sustainable = recipe.Sustainable,
+            LowFodmap = recipe.LowFodmap,
+            PreparationMinutes = recipe.PreparationMinutes,
+            CookingMinutes = recipe.CookingMinutes,
+            ReadyInMinutes = recipe.ReadyInMinutes,
+            Servings = recipe.Servings,
+            HealthScore = recipe.HealthScore,
+            AggregateLikes = recipe.AggregateLikes,
+            WeightWatcherSmartPoints = recipe.WeightWatcherSmartPoints,
+            CreditsText = recipe.CreditsText,
+            SourceName = recipe.SourceName,
+            Cuisines = recipe.Cuisines,
+            DishTypes = recipe.DishTypes,
+            Diets = recipe.Diets,
+            Occasions = recipe.Occasions,
+            SpoonacularScore = recipe.SpoonacularScore,
+            LastUpdated = recipe.LastUpdated
         };
 
         return Ok(recipeDto);
@@ -153,11 +179,37 @@ public class RecipeController : ControllerBase
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
         public string Summary { get; set; }
         public List<RecipeStepDto> Steps { get; set; }
         public List<IngredientDto> Ingredients { get; set; }
         public List<EquipmentDto> Equipment { get; set; }
+        public string? SourceUrl { get; set; }
+        public string SpoonacularSourceUrl { get; set; }
+        public bool? Vegetarian { get; set; }
+        public bool? Vegan { get; set; }
+        public bool? GlutenFree { get; set; }
+        public bool? DairyFree { get; set; }
+        public bool? VeryHealthy { get; set; }
+        public bool? Cheap { get; set; }
+        public bool? VeryPopular { get; set; }
+        public bool? Sustainable { get; set; }
+        public bool? LowFodmap { get; set; }
+        public int? PreparationMinutes { get; set; }
+        public int? CookingMinutes { get; set; }
+        public int? ReadyInMinutes { get; set; }
+        public int? Servings { get; set; }
+        public double? HealthScore { get; set; }
+        public int? AggregateLikes { get; set; }
+        public int? WeightWatcherSmartPoints { get; set; }
+        public string? CreditsText { get; set; }
+        public string? SourceName { get; set; }
+        public List<string>? Cuisines { get; set; }
+        public List<string>? DishTypes { get; set; }
+        public List<string>? Diets { get; set; }
+        public List<string>? Occasions { get; set; }
+        public double? SpoonacularScore { get; set; }
+        public DateTime LastUpdated { get; set; }
     }
     
     public class EquipmentDto
