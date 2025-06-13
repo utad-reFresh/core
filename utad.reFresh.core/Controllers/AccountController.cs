@@ -92,7 +92,7 @@ public class AccountController(
         if (!await _userManager.CheckPasswordAsync(puser, model.Password))
             return BadRequest(new { error = "Wrong password" });
 
-        if (!await _userManager.IsEmailConfirmedAsync(puser))
+        if (!puser.EmailConfirmed)
             return BadRequest(new { error = "Please confirm your email before logging in." });
         
         var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
@@ -126,7 +126,7 @@ public class AccountController(
             return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
         }
 
-        return BadRequest("Invalid login attempt.");
+        return BadRequest("Tentativa de login inválida; verifique as suas credenciais e se o seu email está confirmado.");
     }
     
     [HttpGet("me")]
