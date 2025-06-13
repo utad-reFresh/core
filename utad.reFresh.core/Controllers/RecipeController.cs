@@ -132,6 +132,50 @@ public class RecipeController : ControllerBase
         public string Image { get; set; }
         public string ImageType { get; set; }
     }
+    
+    [HttpGet("find")]
+    public async Task<IActionResult> FindRecipes([FromQuery] string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return BadRequest("Query cannot be empty.");
+
+        // 1. Try to find recipes in the database
+        var recipes = await _db.Recipes
+            .Where(r => r.Title.Contains(query))
+            .OrderByDescending(r => r.SpoonacularScore)
+            .Select(r => new
+            {
+                Id = r.Id,
+                Name = r.Title,
+                ImageUrl = r.ImageUrl
+            })
+            .ToListAsync();
+
+        if (recipes.Any())
+            return Ok(recipes);
+
+        // 2. If not found, call SearchRecipes to fetch and save from Spoonacular
+        var searchResult = await SearchRecipes(query) as OkObjectResult;
+        if (searchResult == null)
+            return NotFound("No recipes found.");
+
+        // 3. Try to find recipes again after saving
+        recipes = await _db.Recipes
+            .Where(r => r.Title.Contains(query))
+            .OrderByDescending(r => r.SpoonacularScore)
+            .Select(r => new
+            {
+                Id = r.Id,
+                Name = r.Title,
+                ImageUrl = r.ImageUrl
+            })
+            .ToListAsync();
+
+        if (recipes.Any())
+            return Ok(recipes);
+
+        return NotFound("No recipes found.");
+    }
 
     [HttpGet("search")]
     public async Task<IActionResult> SearchRecipes([FromQuery] string query)
