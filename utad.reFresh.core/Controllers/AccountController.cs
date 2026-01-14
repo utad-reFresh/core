@@ -53,7 +53,6 @@ public class AccountController(
             }
             
             var appUrl = Request.Headers["Origin"].FirstOrDefault() ?? "https://localhost:7095";
-            var uri = new Uri(appUrl);
             
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             
