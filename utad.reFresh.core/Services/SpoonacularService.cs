@@ -204,7 +204,6 @@ public async Task<Recipe> GetRecipeAsync(int id)
         var ingredientIds = searchResult.Results.Select(r => r.Id).ToList();
         var existingIngredients = _db.Ingredients.Where(i => ingredientIds.Contains(i.Id)).ToList();
 
-        foreach (var ing in searchResult.Results)
         {
             var existing = existingIngredients.FirstOrDefault(i => i.Id == ing.Id);
             if (existing == null)
@@ -217,7 +216,6 @@ public async Task<Recipe> GetRecipeAsync(int id)
                 };
                 _db.Ingredients.Add(ingredient);
             }
-        }
 
         await _db.SaveChangesAsync();
 
