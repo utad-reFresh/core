@@ -204,7 +204,6 @@ public async Task<Recipe> GetRecipeAsync(int id)
         var ingredientIds = searchResult.Results.Select(r => r.Id).ToList();
         var existingIngredients = _db.Ingredients.Where(i => ingredientIds.Contains(i.Id)).ToList();
 
-        var newIngredients = new List<Ingredient>();
         foreach (var ing in searchResult.Results)
         {
             var existing = existingIngredients.FirstOrDefault(i => i.Id == ing.Id);
@@ -217,7 +216,6 @@ public async Task<Recipe> GetRecipeAsync(int id)
                     ImageUrl = $"https://spoonacular.com/cdn/ingredients_100x100/{ing.Image}"
                 };
                 _db.Ingredients.Add(ingredient);
-                newIngredients.Add(ingredient);
             }
         }
 
