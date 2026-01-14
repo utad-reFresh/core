@@ -23,7 +23,6 @@ public async Task<Recipe> GetRecipeAsync(int id)
 
     // Handle ingredients
     var ingredientIds = dto.ExtendedIngredients?.Select(i => i.Id).ToList() ?? new List<int>();
-    var existingIngredients = _db.Ingredients.Where(i => ingredientIds.Contains(i.Id)).ToList();
     var ingredients = new List<Ingredient>();
     foreach (var i in dto.ExtendedIngredients ?? new List<SpoonacularIngredientDto>())
     {
