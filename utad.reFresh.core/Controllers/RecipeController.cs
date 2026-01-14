@@ -221,7 +221,7 @@ public class RecipeController : ControllerBase
         if (string.IsNullOrWhiteSpace(query))
             return BadRequest("Query cannot be empty.");
         
-        var ingredientDtos = new List<IngredientDto>();
+        List<IngredientDto> ingredientDtos;
 
         // Check if this query was already searched
         var previousSearch = await _db.IngredientSearches
