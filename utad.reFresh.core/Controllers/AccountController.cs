@@ -52,7 +52,6 @@ public class AccountController(
                 Console.WriteLine($"{header.Key}: {header.Value}");
             }
             
-            var appUrl = Request.Headers["Origin"].FirstOrDefault() ?? "https://localhost:7095";
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             
             var callbackUrl = Url.Page(
